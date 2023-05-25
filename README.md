@@ -74,17 +74,45 @@ cluster 5, average spend $59.29, count of orders per person 3.49, days since las
 ```
 
 
-## Build and deploy
+## User managed service account for Cloud Run
 
-To build and deploy the [Gradio app](https://gradio.app/) in [Cloud Run](https://cloud.google.com/run/docs/quickstarts/deploy-container) (note authentication is disabled):
+Since the application is deployed in Cloud Run, it uses the permissions of the compute service account by default. It's recommended to use a separate service account for minimum permissions. To do that, [create the service account with impersonation](https://cloud.google.com/run/docs/securing/service-identity) the and the following two extra roles: `roles/aiplatform.user` to call the prediction and `roles/logging.logWriter` to be able to write the logs.
+
+```sh
+# Create service account
+gcloud iam service-accounts create cloud-run-llm \
+    --description="Service account to call LLM models from Cloud Run" \
+    --display-name="cloud-run-llm"
+
+# add aiplatform.user role
+gcloud projects add-iam-policy-binding argolis-rafaelsanchez-ml-dev \
+    --member="serviceAccount:cloud-run-llm@argolis-rafaelsanchez-ml-dev.iam.gserviceaccount.com" \
+    --role="roles/aiplatform.user"
+
+# add logging.logWriter role
+gcloud projects add-iam-policy-binding argolis-rafaelsanchez-ml-dev \
+    --member="serviceAccount:cloud-run-llm@argolis-rafaelsanchez-ml-dev.iam.gserviceaccount.com" \
+    --role="roles/logging.logWriter"
+
+# add permission to impersonate the sa (iam.serviceAccounts.actAs), since this is a user-namaged sa
+gcloud iam service-accounts add-iam-policy-binding \
+    cloud-run-llm@argolis-rafaelsanchez-ml-dev.iam.gserviceaccount.com \
+    --member="user:admin@rafaelsanchez.altostrat.com" \
+    --role="roles/iam.serviceAccountUser"
+```
+
+
+## Build and deploy in Cloud Run
+
+To build and deploy the [Gradio app](https://gradio.app/) in [Cloud Run](https://cloud.google.com/run/docs/quickstarts/deploy-container).
+
+Note authentication is disabled and the service account in the one configured earlier:
 
 ```sh
 gcloud auth configure-docker europe-west4-docker.pkg.dev
 gcloud builds submit --tag europe-west4-docker.pkg.dev/argolis-rafaelsanchez-ml-dev/ml-pipelines-repo/genai-text-demo
-gcloud run deploy genai-text-demo --port 7860 --image europe-west4-docker.pkg.dev/argolis-rafaelsanchez-ml-dev/ml-pipelines-repo/genai-text-demo --allow-unauthenticated --region=europe-west4 --platform=managed  --project=argolis-rafaelsanchez-ml-dev
+gcloud run deploy genai-text-demo --port 7860 --image europe-west4-docker.pkg.dev/argolis-rafaelsanchez-ml-dev/ml-pipelines-repo/genai-text-demo --service-account=cloud-run-llm@argolis-rafaelsanchez-ml-dev.iam.gserviceaccount.com --allow-unauthenticated --region=europe-west4 --platform=managed  --project=argolis-rafaelsanchez-ml-dev
 ```
-
-Since the application is deployed in Cloud Run, it uses the permissions of the compute service account by default. It's recommended to use a separate service account for minimum permissions. One of the mandatory roles is **Vertex AI User** that includes the permission ` aiplatform.endpoint.predict` required to call the foundational model.
 
 
 ## References
@@ -96,3 +124,4 @@ Since the application is deployed in Cloud Run, it uses the permissions of the c
 [5] YouTube video: [Reimagine conversational experiences with Gen App Builder](https://www.youtube.com/watch?v=0vM5UWC5crs)      
 [6] YouTube video: [Make data more accessible and useful with Gen App Builder](https://www.youtube.com/watch?v=kOmG83wGfTs)     
 [7] Use case examples in OpenAI: https://platform.openai.com/examples
+[8] [Overview](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview) of Generative AI support on Vertex AI
