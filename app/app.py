@@ -16,7 +16,7 @@ LOCATION = "us-central1"
 client = google.cloud.logging.Client(project=PROJECT_ID)
 client.setup_logging()
 
-log_name = "llm-log"
+log_name = "genai-vertex-text-log"
 logger = client.logger(log_name)
 
 
@@ -28,10 +28,10 @@ def predict(prompt, max_output_tokens, temperature, top_p, top_k):
     logger.log_text(prompt)
     answer = model.predict(
         prompt,
-        max_output_tokens=max_output_tokens, #128
-        temperature=temperature,#0
-        top_p=top_p, #1
-        top_k=top_k) #40
+        max_output_tokens=max_output_tokens, # default 128
+        temperature=temperature, # default 0
+        top_p=top_p, # default 1
+        top_k=top_k) # default 40
     return answer
 
 examples = [
