@@ -135,6 +135,7 @@ SERVICE_NAME=genai-text-demo
 gcloud artifacts repositories create $AR_REPO --location=$REGION --repository-format=Docker
 gcloud auth configure-docker $REGION-docker.pkg.dev
 gcloud builds submit --tag $REGION-docker.pkg.dev/$PROJECT_ID/$AR_REPO/$SERVICE_NAME
+gcloud services enable run.googleapis.com
 gcloud run deploy $SERVICE_NAME --port 7860 --image $REGION-docker.pkg.dev/$PROJECT_ID/$AR_REPO/$SERVICE_NAME --service-account=cloud-run-llm@$PROJECT_ID.iam.gserviceaccount.com --allow-unauthenticated --region=$REGION --platform=managed  --project=$PROJECT_ID
 ```
 
