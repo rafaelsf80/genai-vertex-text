@@ -105,7 +105,7 @@ gcloud iam service-accounts create cloud-run-llm \
 
 # add aiplatform.user role
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-    --member="serviceAccount:cloud-run-llm@argolis-rafaelsanchez-ml-dev.iam.gserviceaccount.com" \
+    --member="serviceAccount:cloud-run-llm@${PROJECT_ID}.iam.gserviceaccount.com" \
     --role="roles/aiplatform.user"
 
 # add logging.logWriter role
