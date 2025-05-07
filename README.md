@@ -1,4 +1,4 @@
-# Generative AI - PaLM-2 model deployment in Cloud Run 
+# Generative AI - Gemini 2 model deployment in Cloud Run 
 
 The post shows a frontend in [Gradio](https://gradio.app/) that exposes one of the Gemini foundational models, `gemini-2.0-flash`, deployed in Cloud Run.
 
