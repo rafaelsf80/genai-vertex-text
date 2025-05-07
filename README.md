@@ -1,29 +1,34 @@
 # Generative AI - PaLM-2 model deployment in Cloud Run 
 
-The post shows a frontend in [Gradio](https://gradio.app/) that exposes one of the PaLM-2 foundational models, `text-bison@001`, deployed in Cloud Run.
+The post shows a frontend in [Gradio](https://gradio.app/) that exposes one of the Gemini foundational models, `gemini-2.0-flash`, deployed in Cloud Run.
 
-`text-bison@001` is [one of the foundational models](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/models) based on PaLM-2 that is available in Vertex AI. This post shows a front-end exposing this model and [its main parameters](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/models#parameter_definitions) (temperature, output tokens, top-P and top-K) via a Gradio app. 
+`gemini-2.0-flash` is [one of the foundational models](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/models) based on Gemini that is available in Vertex AI. This post shows a front-end exposing this model and [its main parameters](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/models#parameter_definitions) (temperature, output tokens, top-P and top-K) via a Gradio app. 
 
-The model `text-bison@001` can be applied to use cases like dialog summarization, text generation, scoring for marketing, and many others.
+The model `gemini-2.0-flash` can be applied to use cases like dialog summarization, text generation, scoring for marketing, and many others.
 
 The frontend is deployed through a Gradio app deployed in [Cloud Run](https://cloud.google.com/run). An screenshot of the app follows:
 
 ![LLM Text demo](images/text-demo.png)
 
 
-## PaLM-2 in Vertex AI
+## Gemini 2 in Vertex AI
 
-PaLM-2 for Text is one of the foundational models available in Vertex AI. PaLM-2 technical erport can be found [here](https://ai.google/static/documents/palm2techreport.pdf). Using the Vertex AI SDK, you can easily call a prediction with the following:
+Gemini 2 Flash is one of the foundational models available in Vertex AI. Gemini model cards can be found [here](https://modelcards.withgoogle.com/model-cards). Using the Vertex AI SDK, you can easily call a prediction with the following:
 
 ```py
-vertexai.init(project=PROJECT_ID, location=LOCATION)
-model = TextGenerationModel.from_pretrained("text-bison@001")
-model.predict(
-    prompt,
-    max_output_tokens=max_output_tokens, # default 128
-    temperature=temperature, # default 0
-    top_p=top_p, # default 1
-    top_k=top_k) # default 40
+model="gemini-2.0-flash", contents=prompt,
+        config=GenerateContentConfig(
+            temperature=temperature,
+            top_p=top_p,
+            top_k=top_k,
+            candidate_count=1,
+            seed=5,
+            max_output_tokens=max_output_tokens,
+            stop_sequences=["STOP!"],
+            presence_penalty=0.0,
+            frequency_penalty=0.0,
+        ),
+    )
 ```
 
 ## Prompt examples
@@ -137,8 +142,6 @@ gcloud run deploy $SERVICE_NAME --port 7860 --image $REGION-docker.pkg.dev/$PROJ
 
 ## References
 
-[1] PaLM-2 [technical report](https://ai.google/static/documents/palm2techreport.pdf)     
-[2] YouTube video: [Generative AI on Google Cloud](https://youtu.be/Q1zF9pF6flw)      
-[3] YouTube video: [Build, tune, and deploy foundation models with Vertex AI](https://youtu.be/yg2yHIKQ7oM)     
-[4] YouTube video: [Build, tune, and deploy foundation models with Generative AI Support in Vertex AI](https://www.youtube.com/watch?v=-2rQ_AcQMF8)      
-[5] [Overview](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview) of Generative AI support on Vertex AI
+[1] Gemini 2 [model card](https://modelcards.withgoogle.com/model-cards)     
+[2] Gemini 2 [model info](https://ai.google.dev/gemini-api/docs/models)      
+

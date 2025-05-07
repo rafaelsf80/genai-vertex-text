@@ -1,38 +1,44 @@
-""" Generation of text with text-bison@001
+""" Generation of text with gemini-2.0-flash
     https://cloud.google.com/vertex-ai/docs/generative-ai/learn/models
 """
 
-from google.cloud import aiplatform
-import google.cloud.logging
+from google.cloud import logging
 
-import vertexai
-from vertexai.preview.language_models import TextGenerationModel
+from google import genai
+from google.genai.types import GenerateContentConfig
 
 import gradio as gr
 
 PROJECT_ID = "argolis-rafaelsanchez-ml-dev"
-LOCATION = "us-central1"
+LOCATION = "europe-west4"
+MODEL_GOOGLE = "gemini-2.0-flash"
 
-client = google.cloud.logging.Client(project=PROJECT_ID)
-client.setup_logging()
+# https://cloud.google.com/logging/docs/reference/libraries#use
+logging_client = logging.Client()
+log_name = "genai-vertex-text-gradio-log"
+logger = logging_client.logger(log_name)
 
-log_name = "genai-vertex-text-log"
-logger = client.logger(log_name)
-
-
-vertexai.init(project=PROJECT_ID, location=LOCATION)
-
-model = TextGenerationModel.from_pretrained("text-bison@001")
+gemini_client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
 
 def predict(prompt, max_output_tokens, temperature, top_p, top_k):
+
+    response = gemini_client.models.generate_content(
+    model=MODEL_GOOGLE, contents=prompt,
+        config=GenerateContentConfig(
+            temperature=temperature,
+            top_p=top_p,
+            top_k=top_k,
+            candidate_count=1,
+            seed=5,
+            max_output_tokens=max_output_tokens,
+            stop_sequences=["STOP!"],
+            presence_penalty=0.0,
+            frequency_penalty=0.0,
+        ),
+    )
     logger.log_text(prompt)
-    answer = model.predict(
-        prompt,
-        max_output_tokens=max_output_tokens, # default 128
-        temperature=temperature, # default 0
-        top_p=top_p, # default 1
-        top_k=top_k) # default 40
-    return answer
+    logger.log_text(response.text)
+    return response.text
 
 examples = [
     ["Best receipt for banana bread:"],
