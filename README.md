@@ -100,23 +100,23 @@ Since the application is deployed in Cloud Run, it uses the permissions of the c
 
 ```sh
 # Create service account
-gcloud iam service-accounts create cloud-run-llm \
+gcloud iam service-accounts REPLACE_WITH_YOUR_PROJECT_ID \
     --description="Service account to call LLM models from Cloud Run" \
     --display-name="cloud-run-llm"
 
 # add aiplatform.user role
-gcloud projects add-iam-policy-binding argolis-rafaelsanchez-ml-dev \
-    --member="serviceAccount:cloud-run-llm@argolis-rafaelsanchez-ml-dev.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding REPLACE_WITH_YOUR_PROJECT_ID \
+    --member="serviceAccount:cloud-run-llm@<REPLACE_WITH_YOUR_PROJECT_ID>.iam.gserviceaccount.com" \
     --role="roles/aiplatform.user"
 
 # add logging.logWriter role
-gcloud projects add-iam-policy-binding argolis-rafaelsanchez-ml-dev \
-    --member="serviceAccount:cloud-run-llm@argolis-rafaelsanchez-ml-dev.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding REPLACE_WITH_YOUR_PROJECT_ID" \
+    --member="serviceAccount:cloud-run-llm@<REPLACE_WITH_YOUR_PROJECT_ID>.iam.gserviceaccount.com" \
     --role="roles/logging.logWriter"
 
 # add permission to impersonate the sa (iam.serviceAccounts.actAs), since this is a user-namaged sa
 gcloud iam service-accounts add-iam-policy-binding \
-    cloud-run-llm@argolis-rafaelsanchez-ml-dev.iam.gserviceaccount.com \
+    cloud-run-llm@<REPLACE_WITH_YOUR_PROJECT_ID>.iam.gserviceaccount.com \
     --member="user:<REPLACE_WITH_YOUR_USER_ACCOUNT>" \
     --role="roles/iam.serviceAccountUser"
 ```
@@ -142,6 +142,7 @@ gcloud run deploy $SERVICE_NAME --port 7860 --image $REGION-docker.pkg.dev/$PROJ
 
 ## References
 
-[1] Gemini 2 [model card](https://modelcards.withgoogle.com/model-cards)     
+[1] Gemini 2 [model card](https://modelcards.withgoogle.com/model-cards)  
+
 [2] Gemini 2 [model info](https://ai.google.dev/gemini-api/docs/models)      
 

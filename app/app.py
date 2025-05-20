@@ -9,7 +9,7 @@ from google.genai.types import GenerateContentConfig
 
 import gradio as gr
 
-PROJECT_ID = "argolis-rafaelsanchez-ml-dev"
+PROJECT_ID = "<REPLACE_WITH_YOUR_PROJECT_ID>" # <---- CHANGE THIS
 LOCATION = "europe-west4"
 MODEL_GOOGLE = "gemini-2.0-flash"
 
